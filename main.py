@@ -1,3 +1,5 @@
+from src import instructions
+
 MEMORY_SIZE = int('FFFFF', 16)  # 1  MB
 SEGMENT_SIZE = int('10000', 16) # 64 KB
 
@@ -12,8 +14,9 @@ SEGMENTS = {
 if __name__ == "__main__":
     with open('res/test.asm', 'r+') as f:
         asm_code = f.read()
+        
 
-    print(asm_code)
-    # assembler = Assembler()
+    print(instructions.data_transfer)
+    # assembler = Assembler(SEGMENTS)
     # executable = assembler.compile(asm)
     # memory.load(executable)
