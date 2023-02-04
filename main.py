@@ -1,3 +1,4 @@
+from src import assembler
 from src import instructions
 
 MEMORY_SIZE = int('FFFFF', 16)  # 1  MB
@@ -15,8 +16,6 @@ if __name__ == "__main__":
     with open('res/test.asm', 'r+') as f:
         asm_code = f.read()
         
-
-    print(instructions.data_transfer)
-    # assembler = Assembler(SEGMENTS)
+    executable = assembler.assemble(asm_code, SEGMENTS)
     # executable = assembler.compile(asm)
     # memory.load(executable)

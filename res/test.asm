@@ -1,7 +1,7 @@
 ASSUME CS:CODE,DS:DATA
 
 DATA SEGMENT
-    msg db 'hello$'
+    msg db "hello$" ; this is acomment ; sdfsd 
 DATA ENDS  
 
 CODE SEGMENT
@@ -9,9 +9,8 @@ CODE SEGMENT
         mov ax, 1000h
         mov bl, 0
         div bl
-
         mov ah,4ch
         int 21h  
-    
+
 CODE ENDS
 END START
