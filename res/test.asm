@@ -1,6 +1,6 @@
 ASSUME CS:CODE,DS:DATA
 
-DATA SEGMENT
+DATA SEGMENT ;asd
     msg db "'h;e?'l;lo$", ? ; this is a comme'nt ; sdf'sd 
 DATA ENDS  
 
