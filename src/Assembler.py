@@ -3,10 +3,8 @@ import os
 
 class Executable(object):
     def __init__(self, segments):
-        self.name = ''
-        self.title = ''
         self.segment_space = {}
-        self.segment_names = {}
+        self.segment_addressability = {}
         self.segment_lengths = {}
         self.segment_addresses = {
             'CS': hex(segments['CS']),
@@ -14,14 +12,30 @@ class Executable(object):
             'SS': hex(segments['SS']),
             'ES': hex(segments['ES'])
         }
-        self.instructions = []
-        self.instructions_raw = []
+        self.statements = []
+        self.statements_raw = []
 
 def assemble(asm, segments):
     exec = Executable(segments)
     
-    exec.instructions, exec.instructions_raw = _prep(asm)
-    print(exec.instructions_raw)
+    exec.statements, exec.statements_raw = _prep(asm)
+    exec.segment_addressability = _getSegmentAddressability(exec.statements)
+    # for i in exec.statements:
+    #     print(i)
+    for ip in range(len(exec.statements)):
+        print(ip, exec.statements[ip])
+
+    # print(exec.segment_addressability)  
+
+def _getSegmentAddressability(statements):
+    addressability = {}
+    for statement in statements:
+        if statement[0] == 'ASSUME':
+            for seg in statement[1:]:
+                seg = seg.split(':')
+                addressability[seg[1]] = seg[0]     # data is addressable through ds etc.
+            break
+    return addressability
 
 def _prep(asm):
     # Remove Comments
@@ -39,11 +53,11 @@ def _prep(asm):
         lambda match: match.group() if match.group(2) is None else match.group(2).replace('?', '0'),
         asm)
 
-    #list of instructions
-    instructions = []
-    raw_instructions = []
+    # list of instructions
+    statements = []
+    raw_statements = []
     for line in asm.split(os.linesep):
-        instructions.append([word for word in re.split(" |,", line.strip().upper()) if word])
-        raw_instructions.append(line.strip())
+        statements.append([word for word in re.split(" |,", line.strip().upper()) if word])
+        raw_statements.append(line.strip())
 
-    return instructions, raw_instructions
+    return statements, raw_statements

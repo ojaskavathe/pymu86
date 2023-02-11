@@ -17,5 +17,4 @@ if __name__ == "__main__":
         asm_code = f.read()
         
     executable = assembler.assemble(asm_code, SEGMENTS)
-    # executable = assembler.compile(asm)
     # memory.load(executable)
