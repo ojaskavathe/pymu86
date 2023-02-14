@@ -1,8 +1,8 @@
 ASSUME CS:CODE,DS:DATA
 
 DATA SEGMENT ;asd
-    msg db "'h;e?'l;lo$", ? ; this is a comme'nt ; sdf'sd 
-DATA ENDS  
+    arr db 5 dup(15) 
+DATA ENDS
 
 CODE SEGMENT
     start:
@@ -15,4 +15,4 @@ CODE SEGMENT
         int 21h  
 
 CODE ENDS
-END START
+END start
