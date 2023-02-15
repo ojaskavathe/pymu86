@@ -15,10 +15,9 @@ def assemble(asm: str, segments: dict[str, int]) -> Executable:
     ip = 0
     while (ip < len(exec.statements)):
         currentStatement = exec.statements[ip]
-        
         if(len(currentStatement) > 1 and currentStatement[1] == 'SEGMENT'):
             ip = _assembleSegment(ip, exec)
-        
+
         ip += 1
 
     for i, line in enumerate(exec.statements):
@@ -89,22 +88,30 @@ def _bytes(dir: list[str], dir_raw: str) -> list[str]:
     varType = dir[0]
     varType_raw = dir_raw.split()[0]
     varBytes = []
-    val = dir_raw.replace(varType, '', 1).strip()
     
     # DB repeatVal DUP (val1, val2) | DB repeatVal DUP(val)
     if(len(dir) > 2 and dir[2][:3] == 'DUP'):
         repeatVal = utils.decimal(dir[1])
-        vals = dir_raw[dir_raw.find('(') + 1 : -1]
+        vals = dir_raw[dir_raw.find('(') + 1 : -1]                                      # val1, 'val2', 30h
         repeat_raw = varType + ' ' + vals                                               # DB val1, 'val2', 30h
         repeat = [s for s in re.split(r'[ |,]', repeat_raw.strip().upper()) if s]       # ['DB', 'VAL1', '\'VAL2\'', '30h']
         return _bytes(repeat, repeat_raw) * repeatVal
 
     elif(varType == 'DB'):
-        val_raw = utils.replaceNIQ(varType_raw, '').strip()                             # val1, 'val2', 30h
-        data_list = utils.dataList(val_raw)                                             # [val1, 'val2', 48]
-        
+        vals_raw = utils.replaceNIQ(dir_raw, varType_raw, '').strip()                   # val1, 'val2', 30h
+        data_list = utils.dataList(vals_raw)                                            # [val1, 'val2', 48]
+        byte_list = []
+        for val in data_list:
+            if(isinstance(val, int)):
+                byte_list.append(hex(val))
+            elif(isinstance(val, str)):
+                for char in str:
+                    byte_list.append(hex(ord(char)))
+        return byte_list
+
     elif(varType == 'DW'):
         pass
+    
     elif(varType == 'DD'):
         pass
 

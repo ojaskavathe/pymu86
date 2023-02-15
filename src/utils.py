@@ -27,10 +27,15 @@ def replaceNIQ(__str: str,__old: str, __new: str) -> str:
     """Return a copy of string str with occurences of substring old (EXCEPT those within quoted substrings) replaced by substring new."""
 
     def replace_callback(match):
+        a = match.group(2)
         if match.group(2) is None:
             return match.group()
         return match.group(2).replace(__old, __new)
-    return re.sub(r'(\'[^\']*\'|"[^"]*")|([' + __old + '])', replace_callback, __str)
+
+    old_esc = re.escape(__old)
+    return re.sub(fr'(\'[^\']*\'|"[^"]*")|({old_esc})', replace_callback, __str)
+
+print(replaceNIQ('DB ?', '?', '5'))
 
 def splitNIQ(__str: str) -> list[str]:
     """Return a list of the substrings in str separated by space. Doesn't split within quoted substrings. CURRENTLY BROKEN"""
