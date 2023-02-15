@@ -1,4 +1,5 @@
-from src.assembler import Executable, assemble
+from src.executable import Executable
+from src.assembler import assemble
 
 MEMORY_SIZE = int('FFFFF', 16)  # 1  MB
 SEGMENT_SIZE = int('10000', 16) # 64 KB

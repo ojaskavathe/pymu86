@@ -1,3 +1,3 @@
 data_definition = [
-    'DB', 'DW', 'DD', 'DQ', 'DT'
+    'DB', 'DW', 'DD'
 ]

@@ -1,24 +1,8 @@
 import re
 import os
+from src.executable import Executable
 from src.statements import directives
 from src import utils
-
-class Executable(object):
-    def __init__(self, segments):
-        self.ip = 0                             # instruction pointer
-        self.segment_space  = {}
-        self.segment_addressability = {}        # label : segment
-        self.segment_lengths = {}
-        self.segment_addresses = {
-            'CS': hex(segments['CS']),
-            'DS': hex(segments['DS']),
-            'SS': hex(segments['SS']),
-            'ES': hex(segments['ES'])
-        }
-        self.labels = {}
-        self.variables = {}
-        self.statements = {}
-        self.statements_raw = {}
 
 def assemble(asm: str, segments: dict[str, int]) -> Executable:
     """Assemble the given assembly program into an \'executable\'."""
@@ -46,9 +30,9 @@ def _assembleSegment(ip: int, exec: Executable) -> int:
     """Initialize segment memory and assembly all statements in a segment."""
 
     relative_ip = 0
-    segment_label = exec.statements[ip][0]                          # CODE, DATA
-    segment = exec.segment_addressability[segment_label]            # which segment: CS, DS etc.
-    exec.segment_space[segment] = [['0']] * int('10000', 16)          # empty segment
+    segment_label = exec.statements[ip][0]                          # CODE, DATA etc
+    segment = exec.segment_addressability[segment_label]            # CS, DS etc.
+    exec.segment_space[segment] = [['0']] * int('10000', 16)        # empty segment
 
     for segment_ip in range(ip + 1, len(exec.statements)):
         currentStatement = exec.statements[segment_ip]
@@ -78,7 +62,7 @@ def _assembleSegment(ip: int, exec: Executable) -> int:
                 exec.segment_space[segment][segment_ip] = currentStatement
                 relative_ip += 1
         elif(currentStatement[0] in directives.data_definition):    # DB 15, 47, 'hello'
-            varBytes = _toBytes(currentStatement, currentStatement_raw)
+            varBytes = _bytes(currentStatement, currentStatement_raw)
             exec.segment_space[segment][segment_ip:segment_ip + len(varBytes)] = varBytes
             relative_ip += len(varBytes)
         elif(len(currentStatement) > 2 and currentStatement[1] in directives.data_definition):
@@ -89,7 +73,7 @@ def _assembleSegment(ip: int, exec: Executable) -> int:
             # remove name of var from statement:
             # varName db values => db values 
             withoutName = currentStatement_raw.replace(currentStatement_raw.split()[0], '', 1).strip()
-            varBytes = _toBytes(currentStatement[1:], withoutName)
+            varBytes = _bytes(currentStatement[1:], withoutName)
             exec.segment_space[segment][segment_ip:segment_ip + len(varBytes)] = varBytes
             relative_ip += len(varBytes)
         else:                                                       # add instruction to current segment's space
@@ -99,20 +83,30 @@ def _assembleSegment(ip: int, exec: Executable) -> int:
     raise SyntaxError(segment_label + ' Segment doesn\'t end.')
 
 
-def _toBytes(dir: list[str], dir_raw: str) -> list[str]:
+def _bytes(dir: list[str], dir_raw: str) -> list[str]:
     """Return the data defined in the given directive as a list of bytes."""
 
     varType = dir[0]
     varType_raw = dir_raw.split()[0]
     varBytes = []
+    val = dir_raw.replace(varType, '', 1).strip()
     
     # DB repeatVal DUP (val1, val2) | DB repeatVal DUP(val)
     if(len(dir) > 2 and dir[2][:3] == 'DUP'):
-        repeatVal = utils.to_dec(dir[1])
+        repeatVal = utils.decimal(dir[1])
         vals = dir_raw[dir_raw.find('(') + 1 : -1]
-        repeat_raw = varType + ' ' + vals                                               # DB val1, val2
-        repeat = [s for s in re.split(r'[ |,]', repeat_raw.strip().upper()) if s]       # ['DB', 'VAL1', 'VAL2']
-        return _toBytes(repeat, repeat_raw) * repeatVal
+        repeat_raw = varType + ' ' + vals                                               # DB val1, 'val2', 30h
+        repeat = [s for s in re.split(r'[ |,]', repeat_raw.strip().upper()) if s]       # ['DB', 'VAL1', '\'VAL2\'', '30h']
+        return _bytes(repeat, repeat_raw) * repeatVal
+
+    elif(varType == 'DB'):
+        val_raw = utils.replaceNIQ(varType_raw, '').strip()                             # val1, 'val2', 30h
+        data_list = utils.dataList(val_raw)                                             # [val1, 'val2', 48]
+        
+    elif(varType == 'DW'):
+        pass
+    elif(varType == 'DD'):
+        pass
 
 def _getSegmentAddressability(statements: list[list[str]]) -> dict[str, str]:
     """Get the addressability of a segment. Returns a dict in the format { CS : code, DS : data }"""
@@ -130,25 +124,24 @@ def _prep(asm: str) -> tuple[list[list[str]], list[str]]:
     """Remove Comments, Empty Lines, and some cleanup to prepare for assembly."""
 
     # Remove Comments
-    asm = asm + ';'     # Regex breaks if file doesn't end with ';'
+    asm = asm + ';'                                 # Regex breaks if file doesn't end with ';'
     asm = re.sub(
-    r'^((?:[^\'";]*(?:\'[^\']*\'|"[^"]*")?)*)[ \t]*;.*$',
-    r'\1',
-    str(asm), flags=re.MULTILINE)
+        r'^((?:[^\'";]*(?:\'[^\']*\'|"[^"]*")?)*)[ \t]*;.*$',
+        r'\1',
+        str(asm), flags=re.MULTILINE)
 
     # Remove empty lines
     asm = (os.linesep).join([line for line in asm.splitlines() if line.strip() != ''])
     
     # Replace ? with 0
-    asm =  re.sub('(\'[^\']*\'|"[^"]*")|(\?)',
-        lambda match: match.group() if match.group(2) is None else match.group(2).replace('?', '0'),
-        asm)
+    asm = utils.replaceNIQ(asm, '?', '0')
 
     # list of statements (split) (uppercase)
     statements = []
     raw_statements = []
     for line in asm.split(os.linesep):
         statements.append([word for word in re.split(" |,", line.strip().upper()) if word])
+        # statements.append(utils.splitNIQ(line.strip().upper()))
         raw_statements.append(line.strip())
 
     return statements, raw_statements

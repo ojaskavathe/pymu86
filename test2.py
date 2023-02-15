@@ -1,4 +1,5 @@
 import re
+import ast
 
 def to_dec(num):
     """Converts binary, octal, dec, hex strings to decimal base"""
@@ -29,10 +30,29 @@ def to_int_str(matched):
     # print("int_st:", int_str)
     return int_str + suffix
 
-string = '\'a\', "30h yo"'
-string = re.sub(r"[0-9A-Fa-f]+[HhBbOo]{1}[,\s\]]+", to_int_str, '[' + string + ']')
+def to_int(match):
+    if(match.group('whole') is None):
+        return match.group()
+    else:
+        before = match.group('integer')
+        after = str(to_dec(before))
+        return match.group('whole').replace(before, after)
 
-a = ''
-s = re.search(r'[,\s\]]', a)
+def replaceNIQ(__str: str,__old: str, __new: str) -> str:
+    def replace_callback(match):
+        if match.group(2) is None:
+            return match.group()
+        return match.group(2).replace(__old, __new)
+    return re.sub(r'(\'[^\']*\'|"[^"]*")|([' + __old + '])', replace_callback, __str)
 
-print(s)
+string = '"a", 36h, \'50h, yo\''
+# string = re.findall(r'(\'[^\']*\'|"[^"]*")|(?P<whole>(?P<integer>[0-9A-Fa-f]+[HhBbOo]{1})(?P<after>[,\s\]]+))', '[' + string + ']')
+string = re.sub(r'(\'[^\']*\'|"[^"]*")|(?P<whole>(?P<integer>[0-9A-Fa-f]+[HhBbOo]{1})(?P<after>[,\s\]]+))',
+    to_int,
+    '[' + string + ']')
+# string = re.sub(r"[0-9A-Fa-f]+[HhBbOo]{1}[,\s\]]+", to_int_str, '[' + string + ']')
+# string = re.sub(r'([0-9A-Fa-f]+[HhBbOo]{1})([,\s\]]+)', to_int, '[' + string + ']')
+lis = ast.literal_eval(string)
+
+for i in lis:
+    print(i)
