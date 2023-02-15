@@ -73,10 +73,10 @@ def _assembleSegment(ip: int, exec: Executable) -> int:
             # varName db values => db values 
             withoutName = currentStatement_raw.replace(currentStatement_raw.split()[0], '', 1).strip()
             varBytes = _bytes(currentStatement[1:], withoutName)
-            exec.segment_space[segment][segment_ip:segment_ip + len(varBytes)] = varBytes
+            exec.segment_space[segment][relative_ip:relative_ip + len(varBytes)] = varBytes
             relative_ip += len(varBytes)
         else:                                                       # add instruction to current segment's space
-            exec.segment_space[segment][segment_ip] = currentStatement
+            exec.segment_space[segment][relative_ip] = currentStatement
             relative_ip += 1
     
     raise SyntaxError(segment_label + ' Segment doesn\'t end.')
