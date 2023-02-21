@@ -35,8 +35,6 @@ def replaceNIQ(__str: str,__old: str, __new: str) -> str:
     old_esc = re.escape(__old)
     return re.sub(fr'(\'[^\']*\'|"[^"]*")|({old_esc})', replace_callback, __str)
 
-print(replaceNIQ('DB ?', '?', '5'))
-
 def splitNIQ(__str: str) -> list[str]:
     """Return a list of the substrings in str separated by space. Doesn't split within quoted substrings. CURRENTLY BROKEN"""
 
