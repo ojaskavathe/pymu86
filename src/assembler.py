@@ -4,7 +4,10 @@ from src.executable import Executable
 from src.statements import directives
 from src import utils
 
-def assemble(asm: str, segments: dict[str, int]) -> Executable:
+def assemble(
+    asm: str, 
+    segments: dict[str, int]
+) -> Executable:
     """Assemble the given assembly program into an \'executable\'."""
 
     exec = Executable(segments)
@@ -20,18 +23,23 @@ def assemble(asm: str, segments: dict[str, int]) -> Executable:
 
         ip += 1
 
-    for i, line in enumerate(exec.statements):
-        print(i, line, sep='\t')
+    # for i, line in enumerate(exec.statements):
+    #     print(i, line, sep='\t')
+
+
 
     return exec
 
-def _assembleSegment(ip: int, exec: Executable) -> int:
+def _assembleSegment(
+    ip: int, 
+    exec: Executable
+) -> int:
     """Initialize segment memory and assembly all statements in a segment."""
 
     relative_ip = 0
     segment_label = exec.statements[ip][0]                          # CODE, DATA etc
     segment = exec.segment_addressability[segment_label]            # CS, DS etc.
-    exec.segment_space[segment] = [['0']] * int('10000', 16)        # empty segment
+    exec.segment_space[segment] = [['0']] * int('10000', 16)        # fill segment with empty lists instead of just zeroes
 
     for segment_ip in range(ip + 1, len(exec.statements)):
         currentStatement = exec.statements[segment_ip]
@@ -82,7 +90,10 @@ def _assembleSegment(ip: int, exec: Executable) -> int:
     raise SyntaxError(segment_label + ' Segment doesn\'t end.')
 
 
-def _bytes(dir: list[str], dir_raw: str) -> list[str]:
+def _bytes(
+    dir: list[str], 
+    dir_raw: str
+) -> list[str]:
     """Return the data defined in the given directive as a list of bytes."""
 
     varType = dir[0]
@@ -115,7 +126,9 @@ def _bytes(dir: list[str], dir_raw: str) -> list[str]:
     elif(varType == 'DD'):
         pass
 
-def _getSegmentAddressability(statements: list[list[str]]) -> dict[str, str]:
+def _getSegmentAddressability(
+    statements: list[list[str]]
+) -> dict[str, str]:
     """Get the addressability of a segment. Returns a dict in the format { CS : code, DS : data }"""
 
     addressability = {}
@@ -127,7 +140,9 @@ def _getSegmentAddressability(statements: list[list[str]]) -> dict[str, str]:
             break
     return addressability                           # label : segment
 
-def _prep(asm: str) -> tuple[list[list[str]], list[str]]:
+def _prep(
+    asm: str
+) -> tuple[list[list[str]], list[str]]:
     """Remove Comments, Empty Lines, and some cleanup to prepare for assembly."""
 
     # Remove Comments

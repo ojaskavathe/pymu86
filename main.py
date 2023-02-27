@@ -1,5 +1,6 @@
 from src.executable import Executable
 from src.assembler import assemble
+from src.memory import Memory
 
 MEMORY_SIZE = int('FFFFF', 16)  # 1  MB
 SEGMENT_SIZE = int('10000', 16) # 64 KB
@@ -13,6 +14,8 @@ SEGMENTS = {
 }
 
 if __name__ == "__main__":
+    memory = Memory(SEGMENT_SIZE, MEMORY_SIZE)
+
     with open('res/test.asm', 'r+') as f:
         asm_code = f.read()
           
