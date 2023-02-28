@@ -20,5 +20,5 @@ if __name__ == "__main__":
         asm_code = f.read()
           
     executable = assemble(asm_code, SEGMENTS)
-    # memory.load(executable)
+    memory.load(executable)
     print()

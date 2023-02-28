@@ -44,7 +44,7 @@ def _assembleSegment(
     for segment_ip in range(ip + 1, len(exec.statements)):
         currentStatement = exec.statements[segment_ip]
         currentStatement_raw = exec.statements_raw[segment_ip]
-        for word_index in range(len(currentStatement)):
+        for word_index in range(len(currentStatement)):             # replace $ with segment ip
             if(currentStatement[word_index] == '$'):
                 currentStatement[word_index] = relative_ip
 
@@ -53,6 +53,7 @@ def _assembleSegment(
                 raise SyntaxError(segment_label + ' Segment Doesn\'t End.')
             exec.segment_lengths[segment] = relative_ip
             return segment_ip
+        
         elif(':' in currentStatement[0]):                           # handle labels
             label_line = currentStatement[0].split(':')
             exec.labels[label_line[0]] = {
@@ -68,21 +69,24 @@ def _assembleSegment(
                     currentStatement = currentStatement[1:]
                 exec.segment_space[segment][segment_ip] = currentStatement
                 relative_ip += 1
+
         elif(currentStatement[0] in directives.data_definition):    # DB 15, 47, 'hello'
             varBytes = _bytes(currentStatement, currentStatement_raw)
             exec.segment_space[segment][segment_ip:segment_ip + len(varBytes)] = varBytes
             relative_ip += len(varBytes)
+
         elif(len(currentStatement) > 2 and currentStatement[1] in directives.data_definition):
             exec.variables[currentStatement[0]] = {
                 'segment_address':  exec.segment_addresses[segment],
                 'offset':           hex(relative_ip)
             }
             # remove name of var from statement:
-            # varName db values => db values 
+            # varName db values -> db values 
             withoutName = currentStatement_raw.replace(currentStatement_raw.split()[0], '', 1).strip()
             varBytes = _bytes(currentStatement[1:], withoutName)
             exec.segment_space[segment][relative_ip:relative_ip + len(varBytes)] = varBytes
             relative_ip += len(varBytes)
+
         else:                                                       # add instruction to current segment's space
             exec.segment_space[segment][relative_ip] = currentStatement
             relative_ip += 1
