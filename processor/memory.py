@@ -5,19 +5,33 @@ class Memory:
     def __init__(
         self,
         segment_size: int,
-        memory_size:  int
+        memory_size: int
     ) -> None:
-        self.memory_size  = memory_size
-        self.segment_size = segment_size
-        self.space        = [['0']] * memory_size
+        self.memory_size: int       = memory_size
+        self.segment_size: int      = segment_size
+        self.space: list[list[str]] = [['0']] * memory_size
+
+    def read_byte(
+        self,
+        address: int
+    ) -> list[str]:
+        return self.space[address]
+
+    def write_byte(
+        self,
+        address: int,
+        data: str | list[str]
+    ) -> None:
+        self.space[address] = data
 
     def load(
         self,
         exec: Executable
     ) -> None:
         """Loads the program executable into memory."""
+
         for segment in exec.segment_space:
-            segment_address = int(exec.segment_addresses[segment], 16)          # '0x1000' -> 4096
+            segment_address = int(exec.segment_address[segment], 16)          # '0x1000' -> 4096
             segment_length  = exec.segment_lengths[segment]
             segment_end     = segment_address + segment_length                  # 4096 + 64K
             self.space[segment_address: segment_end] = exec.segment_space[segment][:segment_length]
@@ -30,3 +44,9 @@ class Memory:
     def clear(self) -> None:
         """Sets all memory locations to 0."""
         self.space = [['0']] * self.memory_size
+
+    def is_null(
+        self,
+        address: int
+    ) -> bool:
+        return (self.space == ['0'])

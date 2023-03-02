@@ -1,7 +1,7 @@
 import re
 import os
 from src.executable import Executable
-from src.statements import directives
+from statements import directives
 from src import utils
 
 def assemble(
@@ -20,13 +20,13 @@ def assemble(
         currentStatement = exec.statements[ip]
         if(len(currentStatement) > 1 and currentStatement[1] == 'SEGMENT'):
             ip = _assembleSegment(ip, exec)
-
+        elif(currentStatement[0] == 'END' and currentStatement[1] in exec.labels):
+            exec.ip = exec.labels[currentStatement[1]]['offset']            # END START
+        
         ip += 1
 
     # for i, line in enumerate(exec.statements):
-    #     print(i, line, sep='\t')
-
-
+        # print(i, line, sep='\t')
 
     return exec
 
@@ -57,7 +57,7 @@ def _assembleSegment(
         elif(':' in currentStatement[0]):                           # handle labels
             label_line = currentStatement[0].split(':')
             exec.labels[label_line[0]] = {
-                'segment_address':  exec.segment_addresses[segment],
+                'segment_address':  exec.segment_address[segment],
                 'offset':           hex(relative_ip)
             }
             if(len(currentStatement) == 1):                         # label:
@@ -77,7 +77,7 @@ def _assembleSegment(
 
         elif(len(currentStatement) > 2 and currentStatement[1] in directives.data_definition):
             exec.variables[currentStatement[0]] = {
-                'segment_address':  exec.segment_addresses[segment],
+                'segment_address':  exec.segment_address[segment],
                 'offset':           hex(relative_ip)
             }
             # remove name of var from statement:

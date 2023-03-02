@@ -1,7 +1,9 @@
 import re
 import ast
 
-def decimal(num: int) -> str:
+def decimal(
+    num: int
+) -> str:
     """Convert binary, octal, dec, hex strings to decimal base 10"""
 
     if isinstance(num, int):
@@ -23,24 +25,32 @@ def decimal(num: int) -> str:
     except:
         raise ValueError('\'num\' must be an integer.')
 
-def replaceNIQ(__str: str,__old: str, __new: str) -> str:
+def replaceNIQ(
+    string: str,
+    old: str,
+    new: str
+) -> str:
     """Return a copy of string str with occurences of substring old (EXCEPT those within quoted substrings) replaced by substring new."""
 
     def replace_callback(match):
         a = match.group(2)
         if match.group(2) is None:
             return match.group()
-        return match.group(2).replace(__old, __new)
+        return match.group(2).replace(old, new)
 
-    old_esc = re.escape(__old)
-    return re.sub(fr'(\'[^\']*\'|"[^"]*")|({old_esc})', replace_callback, __str)
+    old_esc = re.escape(old)
+    return re.sub(fr'(\'[^\']*\'|"[^"]*")|({old_esc})', replace_callback, string)
 
-def splitNIQ(__str: str) -> list[str]:
+def splitNIQ(
+    string: str
+) -> list[str]:
     """Return a list of the substrings in str separated by space. Doesn't split within quoted substrings. CURRENTLY BROKEN"""
 
-    return [p for p in re.split(r'([ ]|\'[^\']*\'|"[^"]*")', __str) if p.strip()]
+    return [p for p in re.split(r'([ ]|\'[^\']*\'|"[^"]*")', string) if p.strip()]
 
-def dataList(string: str) -> list:
+def dataList(
+    string: str
+) -> list:
     """Return a list of values retrieved from the data definition directive. Also converts hex, oct, binary integers to decimal."""
 
     def _int_string(match):
