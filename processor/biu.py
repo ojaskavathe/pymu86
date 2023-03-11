@@ -27,13 +27,13 @@ class BIU:
         self,
         segment: str
     ) -> int:
-        return (self.registers[segment] + self.prefetch_ip)
+        return ( (self.registers[segment] * 16) + self.prefetch_ip )
     
     def seg_start_ip(
         self,
         segment: str
     ) -> None:
-        return (self.registers[segment] + self.registers['IP'])
+        return ( (self.registers[segment] * 16) + self.registers['IP'] )
 
     def run(self) -> None:
         """Fetch instructions and add them to the instruction queue stream IF there are more than 2 \

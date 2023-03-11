@@ -1,6 +1,6 @@
 from processor.memory import Memory
 from processor.biu import BIU
-from processor.eu import EU
+from processor.EU import EU
 
 class CPU:
 

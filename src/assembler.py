@@ -67,7 +67,7 @@ def _assembleSegment(
     ip: int, 
     exec: Executable
 ) -> int:
-    """Initialize segment memory and assembly all statements in a segment."""
+    """Initialize segment memory and assemble all statements in a segment."""
 
     relative_ip = 0
     segment_label = exec.statements[ip][0]                          # CODE, DATA etc
@@ -131,7 +131,7 @@ def _bytes(
     dir: list[str], 
     dir_raw: str
 ) -> list[str]:
-    """Return the data defined in the given directive as a list of bytes."""
+    """Return the data defined by the given directive as a list of bytes."""
 
     varType = dir[0]
     varType_raw = dir_raw.split()[0]
@@ -158,10 +158,30 @@ def _bytes(
         return byte_list
 
     elif(varType == 'DW'):
-        pass
+        vals_raw = utils.replaceNIQ(dir_raw, varType_raw, '').strip()                   # val1, 'val2', 30h
+        data_list = utils.dataList(vals_raw)                                            # [val1, 'val2', 48]
+        byte_list = []
+        for val in data_list:
+            if(not isinstance(val, int)):
+                raise SyntaxError('DW has to be int.')
+            byte_list.append([hex( val & 0xff )])             # low  order bits
+            byte_list.append([hex( (val >> 8) & 0xff )])      # high order bits
+            
+        return byte_list
     
     elif(varType == 'DD'):
-        pass
+        vals_raw = utils.replaceNIQ(dir_raw, varType_raw, '').strip()                   # val1, 'val2', 30h
+        data_list = utils.dataList(vals_raw)                                            # [val1, 'val2', 48]
+        byte_list = []
+        for val in data_list:
+            if(not isinstance(val, int)):
+                raise SyntaxError('DD has to be int.')
+            byte_list.append([hex( val & 0xff )])             # 1st byte
+            byte_list.append([hex( (val >> 8) & 0xff )])      # 2nd byte
+            byte_list.append([hex( (val >> 16) & 0xff )])     # 3rd byte
+            byte_list.append([hex( (val >> 24) & 0xff )])     # 4th byte
+
+        return byte_list
 
 def _getSegmentAddressability(
     statements: list[list[str]]
@@ -199,8 +219,19 @@ def _prep(
     statements = []
     raw_statements = []
     for line in asm.split(os.linesep):
-        statements.append([word for word in re.split(" |,", line.strip().upper()) if word])
-        # statements.append(utils.splitNIQ(line.strip().upper()))
+
+        # uppercase except in quotes
+        def _upper(match):
+            if(match.group('nq') is None):
+                return match.group()
+            else:
+                return match.group('nq').upper()
+
+        line = re.sub(r'(\'[^\']*\'|"[^"]*")|(?P<nq>\w)',
+            _upper,
+            line.strip())
+
+        statements.append([word for word in re.split(" |,", line) if word])
         raw_statements.append(line.strip())
 
     return statements, raw_statements

@@ -3,6 +3,9 @@ from processor.flag import FlagRegister
 from statements import instructions
 from src import utils
 
+from ._data_transfer import data_transfer
+from ._arithmetic import arithmetic
+
 class EU:
 
     def __init__(
@@ -44,65 +47,9 @@ class EU:
     def execute(self) -> None:
         cs_start_ip = self.bus.seg_start_ip('CS')
         if(self.instruction in instructions.data_transfer):
-            self.data_transfer()
+            data_transfer(self)
         elif(self.instruction in instructions.arithmetic):
-            self.arithmetic()
-
-    def data_transfer(self) -> None:
-        if(self.instruction == 'MOV'):
-            source = self.fetch_operand(self.operands[1])
-            self.write_operand(self.operands[0], source)
-
-        if(self.instruction == 'PUSH'):
-            source = self.fetch_operand(self.operands[0])
-            self.increment_register('SP', -2)
-            self.write_memory(self.effective_sp, source)
-
-        if(self.instruction == 'POP'):
-            popped = self.bus.read_word(self.effective_sp)
-            source = 0
-            for n in popped:
-                source = (source << 8) + int(n, 16)
-
-            dest = self.operands[0]
-            if (self.is_address(dest)):
-                self.write_memory(self.fetch_address(dest), source)
-            elif (self.is_register(dest)):
-                self.write_register(dest, source)
-            
-            self.increment_register('SP', 2)
-
-        elif(self.instruction == 'XLAT'):
-            pass
-
-        # I/O
-        elif(self.instruction == 'IN'):
-            # Input from port into AL or AX. IN AX, 4; IN AL, 7;
-            # And we are not restricted to AL and AX, you can input to all regs.
-            port = utils.decimal(self.operands[1])
-            val = utils.decimal(input(f"Input to Port {port}: "))
-            self.write_register(self.operands[0], val)
-
-        elif self.instruction == 'OUT':
-            # Output from AL or AX to port. OUT 4, AX; OUT DX, AX
-            # And we are not restricted to AL and AX, you can output from all regs.
-            # If port > 255, use DX.
-            port = utils.decimal(self.operands[0])
-            val = self.read_register(self.operands[1])
-            self.print("> " * 16 + "@Port {}: 0x{:<4x} => {}\n".format(port, val, val))
-
-        elif(self.instruction == 'XCHG'):
-            a = self.fetch_operand(self.operands[0])
-            b = self.fetch_operand(self.operands[1])
-            self.write_operand(self.operands[0], b)
-            self.write_operand(self.operands[1], a)
-
-
-    def arithmetic(self) -> None:
-        if (self.instruction == 'ADD'):
-            a = self.fetch_operand(self.operands[0])
-            b = self.fetch_operand(self.operands[1])
-            res = (a + b) & int('0x' + 'f' * self.operand_size * 2, 16)
+            arithmetic(self)
 
     def fetch_operand_size(self) -> None:
         self.operand_size = 2
@@ -153,9 +100,10 @@ class EU:
         register: str,
         value: int
     ) -> None:
-        value = utils.unsigned(value, self.operand_size) & 0xffff       # anding so num fits in 4 bytes
+        value = utils.unsigned(value, self.operand_size) & 0xffff       # anding so num fits in 2 bytes
         if (register in self.gpr):
             self.gpr[register] = value
+
         elif (register in self.gpr_half):
             if(register[1] == 'L'):
                 full_reg = register[0] + 'X'
@@ -163,8 +111,10 @@ class EU:
             elif (register[1] == 'H'):
                 full_reg = register[0] + 'X'
                 self.gpr[full_reg] = (self.gpr[full_reg] & 0xff) + (value << 8)
+
         elif (register in self.bus_reg):
             self.bus.registers[register] = value
+
         else:
             raise SyntaxError('Register not recognized: ' + register)
 
@@ -264,7 +214,7 @@ class EU:
     
     @property
     def effective_sp(self) -> int:
-        return (self.bus.registers['SS'] + self.gpr['SP'])
+        return ( (self.bus.registers['SS'] * 16) + self.gpr['SP'] )
     
     def is_register(
         self,
