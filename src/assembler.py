@@ -1,7 +1,7 @@
 import re
 import os
 from src.executable import Executable
-from statements import directives
+from statements import instructions, directives
 from src import utils
 
 def assemble(
@@ -25,10 +25,43 @@ def assemble(
         
         ip += 1
 
-    # for i, line in enumerate(exec.statements):
-        # print(i, line, sep='\t')
+    _evaluate_labels(exec)
+
+    for i, line in enumerate(exec.statements):
+        print(i, line, sep='\t')
 
     return exec
+
+def _evaluate_labels(
+    exec: Executable
+) -> None:
+    """Change all labels (variables, segments, jump labels) to memory addresses in the instructions."""
+    labels = {}
+
+    # segment labels ('DATA': 'DS' etc)
+    for seg_label, seg in exec.segment_addressability.items():
+        labels[seg_label] = str(exec.segment_address[seg])
+    
+    # variables
+    for var_label, var_details in exec.variables.items():
+        for seg, address in exec.segment_address.items():
+            if (var_details['segment_address'] == address):
+                segment_name = seg
+        labels[var_label] = segment_name + ':[' + var_details['offset'] + ']'
+
+    # changing labels to addresses in memory
+    for segment, data in exec.segment_space.items():
+        segment_length = exec.segment_lengths[segment]
+        for index in range(segment_length):
+            current_ins = data[index]
+            if (current_ins[0] in instructions.transfer_control and current_ins[-1] in exec.labels):
+                pass
+            for i, word in enumerate(current_ins):
+                for label, value in labels.items():
+                    if (word == label):
+                        exec.segment_space[segment][index][i] = value
+                    
+                
 
 def _assembleSegment(
     ip: int, 
@@ -118,10 +151,10 @@ def _bytes(
         byte_list = []
         for val in data_list:
             if(isinstance(val, int)):
-                byte_list.append(hex(val))
+                byte_list.append([hex(val)])
             elif(isinstance(val, str)):
-                for char in str:
-                    byte_list.append(hex(ord(char)))
+                for char in val:
+                    byte_list.append([hex(ord(char))])
         return byte_list
 
     elif(varType == 'DW'):

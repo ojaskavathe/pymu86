@@ -20,15 +20,16 @@ class Memory:
     def write_byte(
         self,
         address: int,
-        data: str | list[str]
+        data: str
     ) -> None:
-        self.space[address] = data
+        self.space[address] = [data]
 
     def load(
         self,
         exec: Executable
     ) -> None:
         """Loads the program executable into memory."""
+        self.executable = exec
 
         for segment in exec.segment_space:
             segment_address = int(exec.segment_address[segment], 16)          # '0x1000' -> 4096
@@ -49,4 +50,4 @@ class Memory:
         self,
         address: int
     ) -> bool:
-        return (self.space == ['0'])
+        return (self.space[address] == ['0'])

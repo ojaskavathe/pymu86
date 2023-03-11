@@ -23,11 +23,13 @@ bit_manipulation = [
 string = [
     'REP', 'REPE', 'REPZ', 'REPNE', 'REPNZ',                        # Repeat
     'MOVS', 'MOVSB', 'MOVSW',                                       # Move
-    'CMPS',                                                         # Compare
-    'SCAS', 'LODS', 'STOS'                                          # Scan, Load, Store
+    'CMPS', 'CMPSB', 'CMPSW',                                       # Compare
+    'SCAS', 'SCASB', 'SCASW',                                       # Scan
+    'LODS', 'LODSB', 'LODSW',                                       # Load
+    'STOS', 'STOSB', 'STOSW'                                        # Store
 ]
 
-control_transfer = [
+transfer_control = [
     'CALL', 'RET', 'JMP'                                            # Unconditional Transfers
     'JA', 'JNBE', 'JAE', 'JNB', 'JB', 'JNAE', 'JBE', 'JNA',         # Conditional Transfers
     'JC', 'JZ', 'JE', 'JGE', 'JNL', 'JL', 'JNGE', 'JLE', 'JNG',

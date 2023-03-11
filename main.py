@@ -23,4 +23,8 @@ if __name__ == "__main__":
     executable = assemble(asm_code, SEGMENTS)
     memory.load(executable)
     cpu = CPU(memory)
+
+    while(True):
+        cpu.run()
+
     print()
