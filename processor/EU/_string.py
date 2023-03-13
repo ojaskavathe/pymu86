@@ -50,15 +50,7 @@ def string(self: "EU") -> None:
         src  = (self.bus.registers['DS'] * 16) + self.gpr['SI']
         dest = (self.bus.registers['ES'] * 16) + self.gpr['DI']
 
-        if (self.operand_size == 1):
-            data_list = self.bus.read_byte(src)
-        else:
-            data_list = self.bus.read_word(src)
-
-        out = 0
-        for res in data_list:
-            out = (out << 8) + (int(res, 16) & 0xff)
-        self.write_memory(dest, out)
+        out = self.read_memory(src)
 
         if(self.flag.direction == 0):
             self.increment_register('SI', self.operand_size)
@@ -71,11 +63,7 @@ def string(self: "EU") -> None:
         self.operand_size = 1
         src  = (self.bus.registers['DS'] * 16) + self.gpr['SI']
         dest = (self.bus.registers['ES'] * 16) + self.gpr['DI']
-        data_list = self.bus.read_byte(src)
-        out = 0
-        for res in data_list:
-            out = (out << 8) + (int(res, 16) & 0xff)
-
+        out = self.read_memory(src)
         self.write_memory(dest, out)
 
         if(self.flag.direction == 0):
@@ -89,10 +77,7 @@ def string(self: "EU") -> None:
         self.operand_size = 2
         src  = (self.bus.registers['DS'] * 16) + self.gpr['SI']
         dest = (self.bus.registers['ES'] * 16) + self.gpr['DI']
-        data_list = self.bus.read_word(src)
-        out = 0
-        for res in data_list:
-            out = (out << 8) + (int(res, 16) & 0xff)
+        out = self.read_memory(src)
 
         if(self.flag.direction == 0):
             self.increment_register('SI', 2)
@@ -106,20 +91,8 @@ def string(self: "EU") -> None:
         src  = (self.bus.registers['DS'] * 16) + self.gpr['SI']
         dest = (self.bus.registers['ES'] * 16) + self.gpr['DI']
 
-        if (self.operand_size == 1):
-            src_list  = self.bus.read_byte(src)
-            dest_list = self.bus.read_byte(dest)
-        else:
-            src_list  = self.bus.read_word(src)
-            dest_list = self.bus.read_word(dest)
-
-        a = 0
-        for res in src_list:
-            a = (a << 8) + (int(res, 16) & 0xff)
-
-        b = 0
-        for res in dest_list:
-            b = (b << 8) + (int(res, 16) & 0xff)
+        a = self.read_memory(src)
+        b = self.read_memory(dest)
 
         res = (a - b) & int('1' * self.operand_size * 8, 2)
         self.flag.set_overflow(a - b, self.operand_size)
@@ -140,16 +113,8 @@ def string(self: "EU") -> None:
         src  = (self.bus.registers['DS'] * 16) + self.gpr['SI']
         dest = (self.bus.registers['ES'] * 16) + self.gpr['DI']
         
-        src_list  = self.bus.read_byte(src)
-        dest_list = self.bus.read_byte(dest)
-        
-        a = 0
-        for res in src_list:
-            a = (a << 8) + (int(res, 16) & 0xff)
-
-        b = 0
-        for res in dest_list:
-            b = (b << 8) + (int(res, 16) & 0xff)
+        a = self.read_memory(src)
+        b = self.read_memory(dest)
 
         res = (a - b) & int('1' * self.operand_size * 8, 2)
         self.flag.set_overflow(a - b, self.operand_size)
@@ -169,16 +134,9 @@ def string(self: "EU") -> None:
         self.operand_size = 2
         src  = (self.bus.registers['DS'] * 16) + self.gpr['SI']
         dest = (self.bus.registers['ES'] * 16) + self.gpr['DI']
-        src_list  = self.bus.read_word(src)
-        dest_list = self.bus.read_word(dest)
         
-        a = 0
-        for res in src_list:
-            a = (a << 8) + (int(res, 16) & 0xff)
-
-        b = 0
-        for res in dest_list:
-            b = (b << 8) + (int(res, 16) & 0xff)
+        a = self.read_memory(src)
+        b = self.read_memory(dest)
 
         res = (a - b) & int('1' * self.operand_size * 8, 2)
         self.flag.set_overflow(a - b, self.operand_size)
@@ -199,14 +157,10 @@ def string(self: "EU") -> None:
         dest = (self.bus.registers['ES'] * 16) + self.gpr['DI']
         if (self.operand_size == 1):
             dest_list = self.bus.read_byte(dest)
-            a = self.read_register('AL')
         else:
             dest_list = self.bus.read_word(dest)
-            a = self.read_register('AX')                
 
-        b = 0
-        for res in dest_list:
-            b = (b << 8) + (int(res, 16) & 0xff)
+        b = self.read_memory(dest)
 
         res = (a - b) & int('1' * self.operand_size * 8, 2)
         self.flag.set_overflow(a - b, self.operand_size)
@@ -223,13 +177,9 @@ def string(self: "EU") -> None:
     elif (self.instruction == 'SCASB'):
         self.operand_size = 1
         dest = (self.bus.registers['ES'] * 16) + self.gpr['DI']
-        dest_list = self.bus.read_byte(dest)
         
         a = self.read_register('AL')
-
-        b = 0
-        for res in dest_list:
-            b = (b << 8) + (int(res, 16) & 0xff)
+        b = self.read_memory(dest)
 
         res = (a - b) & int('1' * self.operand_size * 8, 2)
         self.flag.set_overflow(a - b, self.operand_size)
@@ -246,13 +196,9 @@ def string(self: "EU") -> None:
     elif (self.instruction == 'SCASW'):
         self.operand_size = 2
         dest = (self.bus.registers['ES'] * 16) + self.gpr['DI']
-        dest_list = self.bus.read_word(dest)
         
         a = self.read_register('AX')
-
-        b = 0
-        for res in dest_list:
-            b = (b << 8) + (int(res, 16) & 0xff)
+        b = self.read_memory(dest)
 
         res = (a - b) & int('1' * self.operand_size * 8, 2)
         self.flag.set_overflow(a - b, self.operand_size)
@@ -270,17 +216,11 @@ def string(self: "EU") -> None:
     elif (self.instruction == 'LODS'):
         src_adr = (self.bus.registers['ES'] * 16) + self.gpr['DI']
         if (self.operand_size == 1):
-            src_list = self.bus.read_byte(src_adr)
             dest = 'AL'
         else:
-            src_list = self.bus.read_word(src_adr)
             dest = 'AX'
 
-        src = 0
-        for res in src_list:
-            src = (src << 8) + (int(res, 16) & 0xff)
-
-        self.write_register(dest, src)
+        src = self.read_memory(src_adr)
 
         if(self.flag.direction == 0):
             self.increment_register('DI', self.operand_size)
@@ -289,11 +229,7 @@ def string(self: "EU") -> None:
 
     elif (self.instruction == 'LODSB'):
         src_adr = (self.bus.registers['ES'] * 16) + self.gpr['DI']
-        src_list = self.bus.read_byte(src_adr)        
-
-        src = 0
-        for res in src_list:
-            src = (src << 8) + (int(res, 16) & 0xff)
+        src = self.read_memory(src_adr)
 
         self.write_register('AL', src)
 
@@ -304,11 +240,7 @@ def string(self: "EU") -> None:
 
     elif (self.instruction == 'LODSW'):
         src_adr = (self.bus.registers['ES'] * 16) + self.gpr['DI']
-        src_list = self.bus.read_word(src_adr)        
-
-        src = 0
-        for res in src_list:
-            src = (src << 8) + (int(res, 16) & 0xff)
+        src = self.read_memory(src_adr)
 
         self.write_register('AX', src)
 
