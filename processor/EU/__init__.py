@@ -5,6 +5,9 @@ from src import utils
 
 from ._data_transfer import data_transfer
 from ._arithmetic import arithmetic
+from ._bit_manipulation import bit_manipulation
+from ._string import string
+from ._control_transfer import control_transfer
 
 class EU:
 
@@ -45,11 +48,22 @@ class EU:
         pass
 
     def execute(self) -> None:
-        cs_start_ip = self.bus.seg_start_ip('CS')
+        cs_start_ip = self.bus.phy_ip
         if(self.instruction in instructions.data_transfer):
             data_transfer(self)
         elif(self.instruction in instructions.arithmetic):
             arithmetic(self)
+        elif(self.instruction in instructions.bit_manipulation):
+            bit_manipulation(self)
+        elif(self.instruction in instructions.string):
+            string(self)
+        elif(self.instruction in instructions.control_transfer):
+            control_transfer(self)
+        else:
+            raise SyntaxError('Instruction[' + self.instruction + '] not supported.')
+
+        if (cs_start_ip != self.bus.phy_ip):
+            self.bus.clear_instruction_queue()
 
     def fetch_operand_size(self) -> None:
         self.operand_size = 2
@@ -57,16 +71,16 @@ class EU:
             if (operand in self.gpr_half):
                 self.operand_size = 1
 
-        if 'PTR' in self.operands:
+        if ('PTR' in self.operands):
             self.operands.remove('PTR')
             if ('BYTE' in self.operands):
                 self.operand_size = 1
-                self.operands.remove('PTR')
+                self.operands.remove('BYTE')
             elif ('WORD' in self.operands):
-                self.operand_size = 1
+                self.operand_size = 2
                 self.operands.remove('WORD')
             elif ('DWORD' in self.operands):
-                self.operand_size = 1
+                self.operand_size = 4
                 self.operands.remove('DWORD')
             else:
                 raise SyntaxError('No Field Value for PTR.')
@@ -110,7 +124,7 @@ class EU:
                 self.gpr[full_reg] = (self.gpr[full_reg] & 0xff00) + (value & 0xff)
             elif (register[1] == 'H'):
                 full_reg = register[0] + 'X'
-                self.gpr[full_reg] = (self.gpr[full_reg] & 0xff) + (value << 8)
+                self.gpr[full_reg] = (self.gpr[full_reg] & 0x00ff) + ((value << 8) & 0xff00)
 
         elif (register in self.bus_reg):
             self.bus.registers[register] = value
@@ -154,17 +168,35 @@ class EU:
 
         return out
 
+    def read_memory(
+        self,
+        address: int
+    ) -> int:
+        if(self.operand_size == 1):
+            result = self.bus.read_byte(address)
+        elif(self.operand_size == 2):
+            result = self.bus.read_word(address)
+        elif(self.operand_size == 4):
+            result = self.bus.read_dword(address)
+        else:
+            raise SyntaxError('Could not read from location ' + address)
+
+        out = 0
+        for res in result:
+            out = (out << 8) + (int(res, 16) & 0xff)
+        return out
+
     def write_memory(
         self,
         address: int,
         data: str
     ) -> None:
         if(self.operand_size == 1):
-            self.bus.write_byte(address)
+            self.bus.write_byte(address, data)
         elif(self.operand_size == 2):
-            self.bus.write_word(address)
+            self.bus.write_word(address, data)
         elif(self.operand_size == 4):
-            self.bus.write_dword(address)
+            self.bus.write_dword(address, data)
         else:
             raise SyntaxError('Could not write (' + data + ') to location ' + address)
 
@@ -213,7 +245,7 @@ class EU:
         self.output += string
     
     @property
-    def effective_sp(self) -> int:
+    def physical_sp(self) -> int:
         return ( (self.bus.registers['SS'] * 16) + self.gpr['SP'] )
     
     def is_register(

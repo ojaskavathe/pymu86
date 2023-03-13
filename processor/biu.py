@@ -23,17 +23,13 @@ class BIU:
 
         self.prefetch_ip = int(self.memory.executable.ip, 16)
 
-    def prefetch_phy_ip(
-        self,
-        segment: str
-    ) -> int:
-        return ( (self.registers[segment] * 16) + self.prefetch_ip )
+    @property
+    def prefetch_phy_ip(self) -> int:
+        return ( (self.registers['CS'] * 16) + self.prefetch_ip )
     
-    def seg_start_ip(
-        self,
-        segment: str
-    ) -> None:
-        return ( (self.registers[segment] * 16) + self.registers['IP'] )
+    @property
+    def phy_ip(self) -> None:
+        return ( (self.registers['CS'] * 16) + self.registers['IP'] )
 
     def run(self) -> None:
         """Fetch instructions and add them to the instruction queue stream IF there are more than 2 \
@@ -44,18 +40,18 @@ class BIU:
     
     def fetch_instructions(self) -> None:
         while(not self.instruction_queue.full()):
-            if(self.memory.is_null(self.prefetch_phy_ip('CS'))):
+            if(self.memory.is_null(self.prefetch_phy_ip)):
                 break
             else:
                 self.fetch_next_instruction()
 
     def fetch_next_instruction(self) -> None:
-        next_instruction = self.memory.read_byte(self.prefetch_phy_ip('CS'))
+        next_instruction = self.memory.read_byte(self.prefetch_phy_ip)
         self.instruction_queue.put(next_instruction)
         self.prefetch_ip += 1
 
     def clear_instruction_queue(self) -> None:
-        """Empties the instruction queue whenever there's a branch."""
+        """Empties the instruction queue whenever there's a jump/branch."""
         
         self.instruction_queue.queue.clear()
         self.prefetch_ip = self.registers['IP']

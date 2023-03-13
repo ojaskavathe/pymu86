@@ -2,7 +2,7 @@ ASSUME CS:CODE,DS:DATA
 
 DATA SEGMENT ;asd
     arr db 5 dup(15)
-    num dw 10
+    num db 4
     string db 'hello'
 DATA ENDS
 
@@ -10,9 +10,10 @@ CODE SEGMENT
     start:
         mov ax, data
         mov ds, ax
-        
-        mov dx, 'a'
-        add ax, dx
+
+        mov si, 5 
+        movsb
+        mov al, num
 
         mov cx, [1432h]
         mov bx, $

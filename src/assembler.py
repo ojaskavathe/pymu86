@@ -54,8 +54,20 @@ def _evaluate_labels(
         segment_length = exec.segment_lengths[segment]
         for index in range(segment_length):
             current_ins = data[index]
-            if (current_ins[0] in instructions.transfer_control and current_ins[-1] in exec.labels):
-                pass
+            # replace labels with their address
+            if (current_ins[0] in instructions.control_transfer and current_ins[-1] in exec.labels):
+                for w in ['PTR', 'SHORT', 'NEAR']:
+                    if (w in current_ins):
+                        exec.segment_space[segment][index].remove(w)
+                if (current_ins[1] == 'FAR'):
+                    exec.segment_space[segment][index].remove('FAR')
+                    label_adr = exec.labels[current_ins[1]]['segment_address'] + ':' + \
+                                exec.labels[current_ins[1]]['offset'] 
+                    exec.segment_space[segment][index][1] = label_adr
+                else:
+                    exec.segment_space[segment][index][1] = exec.labels[current_ins[1]]['offset']
+
+            # replace variables with their address
             for i, word in enumerate(current_ins):
                 for label, value in labels.items():
                     if (word == label):
@@ -93,6 +105,8 @@ def _assembleSegment(
                 'segment_address':  exec.segment_address[segment],
                 'offset':           hex(relative_ip)
             }
+
+            # remove the label
             if(len(currentStatement) == 1):                         # label:
                 pass                                                #       mov ax, bx
             else:   
