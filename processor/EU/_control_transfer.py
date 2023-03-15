@@ -1,3 +1,5 @@
+import datetime
+
 from src import utils
 from statements import instructions
 
@@ -31,7 +33,7 @@ def control_transfer(self: "EU") -> None:
         self.instruction = 'JMP'
         self.execute()
     
-    elif (self.instruction == 'RET' or self.instruction == 'RETN'):
+    elif (self.instruction in ['RET', 'RETN']):
         self.write_register('IP', self.read_memory(self.physical_sp))
         self.increment_register('SP', 2)
     
@@ -41,6 +43,26 @@ def control_transfer(self: "EU") -> None:
         self.write_register('CS', self.read_memory(self.physical_sp))
         self.increment_register('SP', 2)
 
+    # Iteration Control
+    elif (self.instruction == 'LOOP'):
+        self.increment_register('CX', -1)
+        if (self.gpr['CX'] != 0):
+            self.write_register('IP', self.fetch_operand(self.operands[0]))
+
+    elif (self.instruction in ['LOOPE', 'LOOPZ']):
+        self.increment_register('CX', -1)
+        if (self.gpr['CX'] != 0 and self.flag.zero == 1):
+            self.write_register('IP', self.fetch_operand(self.operands[0]))
+    
+    elif (self.instruction in ['LOOPNE', 'LOOPNZ']):
+        self.increment_register('CX', -1)
+        if (self.gpr['CX'] != 0 and self.flag.zero == 0):
+            self.write_register('IP', self.fetch_operand(self.operands[0]))
+
+    elif (self.instruction == 'JCXZ'):
+        if (self.gpr['CX'] == 0):
+            self.write_register('IP', self.fetch_operand(self.operands[0]))
+
     elif (self.instruction in instructions.conditional_transfer):
         jump_hash = {
             'JA':   self.flag.carry == 0 and self.flag.zero == 0,
@@ -48,7 +70,6 @@ def control_transfer(self: "EU") -> None:
             'JB':   self.flag.carry == 1,
             'JBE':  self.flag.carry == 0 and self.flag.zero == 1,
             'JC':   self.flag.carry == 1,
-            'JCXZ': self.gpr['CX'] == 0,
             'JE':   self.flag.zero == 1,
             'JG':   self.flag.zero == 0 and self.flag.sign == self.flag.overflow,
             'JGE':  self.flag.sign == self.flag.overflow,
@@ -77,3 +98,90 @@ def control_transfer(self: "EU") -> None:
         }
         if (jump_hash[self.instruction]):
             self.write_register('IP', self.fetch_operand(self.operands[0]))     # no far conditional jumps
+    
+    # Interrupts
+    elif (self.instruction == 'INT'):
+        if not self.operands:
+            self.print("\breakpoint interrupt\n")
+            self.interrupt = True
+        else:
+            int_type = utils.decimal(self.operands[0])
+            if int_type == 3: # breakpoint
+                self.print("\breakpoint interrupt\n")
+                self.interrupt = True
+            elif int_type == utils.decimal('10H'):
+                self.bios_isr_10h()
+            elif int_type == utils.decimal('21H'):
+                ah = self.read_register('AH')
+                al = self.read_register('AL')
+                if self.debug_interrupts:
+                    self.print(f"\nCall DOS interrupt routine 21H, AH={hex(ah)}\n")
+                
+                if ah == 0x0:
+                    if self.debug_interrupts:
+                        self.print("Interrupt Routine Function: Program Termination\n")
+                    self.print("> " * 16 + "Exit to operating system")
+                    self.shutdown = True
+
+                elif ah == 0x01:
+                    if self.debug_interrupts:
+                        self.print("Interrupt routine function: keyboard typing and echoing\n")
+                    char = input()[0]
+                    self.write_register('AL', ord(char)) # ascii存储
+                
+                elif ah == 0x02:
+                    if self.debug_interrupts:
+                        self.print("Interrupt routine function: display output\n")
+                    char = chr(self.read_register('DL'))
+                    self.print('> '+ char + '\n')
+
+                elif ah == 0x9: # Display string DS:DX= string address '$' end string
+                    if self.debug_interrupts:
+                        self.print("Interrupt routine function: display string\n")
+                    address = (self.read_register('DS') << 4) + self.read_register('DX')
+                    count = 0
+
+                    while True:
+                        char = chr(utils.decimal(self.bus.read_byte(address)[0]))
+                        if char == '$' or count == 500: # If it does not end, it stops when it reaches the 500 cap.
+                            break
+                        # print(address)
+                        self.print(char)
+                        address += 1
+                        count += 1
+
+                elif ah == 0x2a: # Get date: CX:DH:DL = year:month:day
+                    if self.debug_interrupts:
+                        self.print("Interrupt routine function: read system date\n")
+                    now = datetime.datetime.now()
+                    self.write_register('CX', now.year)
+                    self.write_register('DH', now.month)
+                    self.write_register('DL', now.day)
+
+                elif ah == 0x2c: # Get time: CH:CL = hour:minute DH:DL = second:millisecond
+                    if self.debug_interrupts:
+                        self.print("Interrupt routine function: read system time\n")
+                    now = datetime.datetime.now()
+                    self.write_register('CH', now.hour)
+                    self.write_register('CL', now.minute)
+                    self.write_register('DH', now.second)
+                    self.write_register('DL', int(now.microsecond * 1e4))
+                
+                elif ah == 0x35:
+                    if self.debug_interrupts:
+                        self.print("Interrupt routine function: fetch interrupt vector\n")
+                    int_type = self.read_reg('AL')
+                    self.write_register('BX', self.read_memory(int_type * 4))
+                    self.write_register('ES', self.read_memory(int_type * 4 + 2))
+                
+                elif ah == 0x4c: # Exit with return code
+                    if self.debug_interrupts:
+                        self.print("Interrupt routine function: end with return value\n")
+                    self.print(f"\nExit with return code {al}\n")
+                    self.shutdown = True
+                else:
+                    raise SyntaxError('Interrupt Error')
+            elif int_type in [utils.decimal(i) for i in ['7ch']]:
+                self.interrupt_handler(int_type)
+            else:
+                raise SyntaxError('Interrupt Error')

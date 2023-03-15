@@ -57,8 +57,7 @@ def bit_manipulation(self: "EU") -> None:
         self.flag.set_sign(res, self.operand_size)
 
     # Shifts
-    elif (self.instruction == 'SAL' or \
-          self.instruction == 'SHL'):
+    elif (self.instruction in ['SAL', 'SHL']):
         
         src = self.fetch_operand(self.operands[0])
         count = self.fetch_operand(self.operands[1])

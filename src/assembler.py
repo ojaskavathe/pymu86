@@ -27,9 +27,6 @@ def assemble(
 
     _evaluate_labels(exec)
 
-    for i, line in enumerate(exec.statements):
-        print(i, line, sep='\t')
-
     return exec
 
 def _evaluate_labels(
@@ -45,7 +42,7 @@ def _evaluate_labels(
     # variables
     for var_label, var_details in exec.variables.items():
         for seg, address in exec.segment_address.items():
-            if (var_details['segment_address'] == address):
+            if (var_details['seg'] == address):
                 segment_name = seg
         labels[var_label] = segment_name + ':[' + var_details['offset'] + ']'
 
@@ -61,19 +58,25 @@ def _evaluate_labels(
                         exec.segment_space[segment][index].remove(w)
                 if (current_ins[1] == 'FAR'):
                     exec.segment_space[segment][index].remove('FAR')
-                    label_adr = exec.labels[current_ins[1]]['segment_address'] + ':' + \
+                    label_adr = exec.labels[current_ins[1]]['seg'] + ':' + \
                                 exec.labels[current_ins[1]]['offset'] 
                     exec.segment_space[segment][index][1] = label_adr
                 else:
                     exec.segment_space[segment][index][1] = exec.labels[current_ins[1]]['offset']
 
-            # replace variables with their address
+            # replace labels & variables with their address
             for i, word in enumerate(current_ins):
+                for s in ['SEG', 'OFFSET']:
+                    if (word == s):
+                        exec.segment_space[segment][index].remove(s)
+                        if (current_ins[i] in exec.labels.keys()):
+                            exec.segment_space[segment][index][i] = exec.labels[current_ins[i]][s.lower()]
+                        else:
+                            exec.segment_space[segment][index][i] = exec.variables[current_ins[i]][s.lower()]
+
                 for label, value in labels.items():
                     if (word == label):
                         exec.segment_space[segment][index][i] = value
-                    
-                
 
 def _assembleSegment(
     ip: int, 
@@ -102,7 +105,7 @@ def _assembleSegment(
         elif(':' in currentStatement[0]):                           # handle labels
             label_line = currentStatement[0].split(':')
             exec.labels[label_line[0]] = {
-                'segment_address':  exec.segment_address[segment],
+                'seg':  exec.segment_address[segment],
                 'offset':           hex(relative_ip)
             }
 
@@ -124,7 +127,7 @@ def _assembleSegment(
 
         elif(len(currentStatement) > 2 and currentStatement[1] in directives.data_definition):
             exec.variables[currentStatement[0]] = {
-                'segment_address':  exec.segment_address[segment],
+                'seg':  exec.segment_address[segment],
                 'offset':           hex(relative_ip)
             }
             # remove name of var from statement:

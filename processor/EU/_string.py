@@ -17,8 +17,7 @@ def string(self: "EU") -> None:
             c = self.read_register('CX')
             self.write_register('CX', c - 1)
 
-    elif (self.instruction == 'REPE' or \
-        self.instruction == 'REPZ'):
+    elif (self.instruction in ['REPE', 'REPZ']):
 
         self.instruction = self.operands[0]
         self.operands = self.operands[1:]
@@ -31,8 +30,7 @@ def string(self: "EU") -> None:
             if (self.flag.zero == 0):
                 break
 
-    elif (self.instruction == 'REPNE' or \
-        self.instruction == 'REPNZ'):
+    elif (self.instruction in ['REPNE', 'REPNZ']):
         
         self.instruction = self.operands[0]
         self.operands = self.operands[1:]

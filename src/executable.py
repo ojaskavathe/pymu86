@@ -13,7 +13,7 @@ class Executable(object):
             'SS': hex(segments['SS']),
             'ES': hex(segments['ES'])
         }
-        self.labels: dict[str, dict] = {}                       # {'START': {'segment_address': '0x1000', 'offset': '0x0'}, ... }
-        self.variables: dict[str, dict] = {}                    # {'ARR': {'segment_address': '0x2000', 'offset': '0x0'}, ... }
+        self.labels: dict[str, dict] = {}                       # {'START': {'seg': '0x1000', 'offset': '0x0'}, ... }
+        self.variables: dict[str, dict] = {}                    # {'ARR': {'seg': '0x2000', 'offset': '0x0'}, ... }
         self.statements: list[list[str]] = {}
         self.statements_raw: list[str] = {}

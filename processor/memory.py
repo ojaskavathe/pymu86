@@ -1,4 +1,5 @@
 from src.executable import Executable
+from processor.ICU import interrupt_controller
 
 class Memory:
 
@@ -26,7 +27,8 @@ class Memory:
 
     def load(
         self,
-        exec: Executable
+        exec: Executable,
+        debug: bool
     ) -> None:
         """Loads the program executable into memory."""
         self.executable = exec
@@ -35,13 +37,15 @@ class Memory:
             segment_address  = int(exec.segment_address[segment], 16)           # '0x1000' -> 4096
             physical_address = segment_address * 16                             # '0x1000' -> '0x10000'
             segment_length   = exec.segment_lengths[segment]
-            segment_end      = physical_address + segment_length                  # '0x10000' + 64K
+            segment_end      = physical_address + segment_length                # '0x10000' + 64K
             self.space[physical_address: segment_end] = exec.segment_space[segment][:segment_length]
 
             # Super janky, find a better solution
             # The reason I have to do this is if two segments overlap, the overlapped region gets reset even 
             # if that region of memory isn't being used. So my solution for the time being is to only load
             # the parts of the segment that are currently being used
+
+        interrupt_controller.load_isr(self, debug)
 
     def clear(self) -> None:
         """Sets all memory locations to 0."""

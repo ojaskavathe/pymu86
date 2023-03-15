@@ -13,7 +13,8 @@ class EU:
 
     def __init__(
         self,
-        bus: BIU
+        bus: BIU,
+        debug: bool
     ) -> None:
         self.bus = bus
         self.IR: list[str] = []
@@ -28,20 +29,26 @@ class EU:
             'SI': 0,    # index
             'DI': 0,
         }
-        self.gpr_half = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DH', 'DL']
-        self.gpr_all = [reg for reg in self.gpr] + self.gpr_half
-        self.bus_reg = [reg for reg in self.bus.registers]
+        self.gpr_half: list[str] = ['AH', 'AL', 'BH', 'BL', 'CH', 'CL', 'DH', 'DL']
+        self.gpr_all: list[str] = [reg for reg in self.gpr] + self.gpr_half
+        self.bus_reg: list[str] = [reg for reg in self.bus.registers]
+
+        self.interrupt: bool = debug
+        self.debug_interrupts: bool = False
+
+        self.shutdown = False
 
         self.instruction: str = ''
         self.operands: list[str] = []
         self.operand_size: int = 2               # size of operands in bytes
 
-        self.output = ''
+        self.output: str = ''
 
     def run(self) -> None:
         self.operands = []
         self.IR = self.bus.instruction_queue.get()
         self.instruction = self.IR[0]
+        self.bus.registers['IP'] += 1
         self.operands = self.IR[1:]
         self.fetch_operand_size()
         self.execute()
@@ -224,6 +231,8 @@ class EU:
             for res in result:
                 out = (out << 8) + (int(res, 16) & 0xff)
             return out
+        elif (operand[0] == operand[-1] == '\''):
+            return ord(operand[1])
         else:                                           # immediate
             return utils.decimal(operand)
         
@@ -259,3 +268,27 @@ class EU:
         string: str
     ) -> bool:
         return '[' in string
+    
+    def interrupt_handler(
+        self,
+        type: int
+    ):
+        self.increment_register('SP', -2)
+        self.write_memory(self.physical_sp, self.flag.get())
+        self.flag.trap = 0
+        self.flag.interrupt = 0
+        self.increment_register('SP', -2)
+        self.write_memory(self.physical_sp, self.read_register('CS'))
+        self.increment_register('SP', -2)
+        self.write_memory(self.physical_sp, self.read_register('IP'))
+        self.operand_size = 2
+        ip_val = self.read_memory(type * 4)
+        cs_val = self.read_memory(type * 4 + 2)
+        self.write_register('IP', ip_val)
+        self.write_register('CS', cs_val)
+        if self.debug_interrupts:
+            self.print(f"Execute interrupt: {hex(type)} ...\n")
+            self.print("Securing Site Success\n")
+            self.print(f"Read interrupt vector table {hex(type * 4)} offset address {hex(ip_val)} => IP\n")
+            self.print(f"Read interrupt vector table {hex(type * 4 + 2)} Branch address {hex(cs_val)} => CS\n")
+            self.print("Enter the interrupt routine...\n")

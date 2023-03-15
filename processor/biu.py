@@ -114,3 +114,6 @@ class BIU:
             self.write_byte(address + 3, (data >> 24) & 0xff)
         else:
             raise SyntaxError('Value[' + data + '] could not be written.')
+    
+    def instructions_done(self) -> bool:
+        return self.memory.is_null(self.prefetch_phy_ip)

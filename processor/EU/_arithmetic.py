@@ -105,15 +105,16 @@ def arithmetic(self: "EU") -> None:
         self.flag.set_sign(res, self.operand_size)
 
     elif (self.instruction == 'CMP'):
+        osz = self.operand_size
         a = self.fetch_operand(self.operands[0])
         b = self.fetch_operand(self.operands[1])
-        res = (a - b) & int('0x' + 'f' * self.operand_size * 2, 16)
+        res = (utils.signed(a, osz) - utils.signed(b, osz)) & int('0x' + 'f' * osz * 2, 16)
         
-        self.flag.set_overflow(a - b, self.operand_size)
-        self.flag.set_carry(utils.unsigned(a, self.operand_size) < utils.unsigned(b, self.operand_size))
+        self.flag.set_overflow(utils.signed(a, osz) - utils.signed(b, osz), osz)
+        self.flag.set_carry(utils.unsigned(a, osz) < utils.unsigned(b, osz))
         self.flag.set_parity(res)
         self.flag.set_zero(res)
-        self.flag.set_sign(res, self.operand_size)
+        self.flag.set_sign(res, osz)
 
     elif (self.instruction == 'AAS'):
         pass
