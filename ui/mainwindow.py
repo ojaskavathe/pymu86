@@ -45,6 +45,9 @@ class MainWindow(object):
         self.gui = uic.loadUi(_resource('main.ui'))
         # Assembly editor get focus on start
         self.asmEdit = self.gui.findChild(CodeEditor, "asmEdit")
+        self.sbar = self.gui.findChild(QScrollBar, 'sbar')
+        self.asmEdit.setVerticalScrollBar(self.sbar)
+        
         # Get console area
         self.console = self.gui.findChild(QPlainTextEdit, "txtConsole")
 
@@ -69,9 +72,6 @@ class MainWindow(object):
 
     def setupEditorAndDiagram(self):
         self.asmEdit.setFocus()
-        self.asmEdit.setStyleSheet("""QPlainTextEdit{
-            font-size: 11pt;
-            color: #ccc; }""")
         self.highlight = AssemblyHighlighter(self.asmEdit.document())
 
 
@@ -140,10 +140,9 @@ class MainWindow(object):
         treeViewData = self.treeViewData
         treeViewData.setModel(self.DataSegModel)
         treeViewData.resizeColumnToContents(0)
+        width = treeViewData.width() - treeViewData.columnWidth(0)
         for i in range(1,9):
-            width = treeViewData.width() - treeViewData.columnWidth(0)
             treeViewData.setColumnWidth(i, width // 8)
-            # treeViewData.resizeColumnToContents(i)
 
     def setupActions(self):
         self.actionNew = self.gui.findChild(QAction, "actionNew")

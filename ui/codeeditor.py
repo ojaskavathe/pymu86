@@ -78,7 +78,7 @@ class CodeEditor(QPlainTextEdit):
     def updateLineNumberAreaWidth(self, newBlockCount):
         self.setViewportMargins(self.lineNumberAreaWidth(), 0, 0, 0)
 
-    def highlightCurrentLine(self, lineColor=QColor("#000000"), force=False):
+    def highlightCurrentLine(self, lineColor=QColor("#eee8d6"), force=False):
         if not self.isReadOnly() or force:
             extraSelections = []
 
@@ -185,7 +185,7 @@ class AssemblyHighlighter(QSyntaxHighlighter):
         for pattern in opcodePatterns:
             rule = HighlightingRule()
             rule.pattern = QRegExp(r'\b%s\b' % pattern, Qt.CaseInsensitive)
-            rule.format = format([200, 120, 50], 'bold')
+            rule.format = format([60, 173, 208], 'bold')
             self.highlightingRules.append(rule)
 
         registerPatterns = directives.registers
@@ -219,7 +219,7 @@ class AssemblyHighlighter(QSyntaxHighlighter):
         # comment
         rule = HighlightingRule()
         rule.pattern = QRegExp(r';[^\n]*')
-        rule.format = format([85, 85, 85], 'bold')
+        rule.format = format([170, 180, 120], 'bold')
         self.highlightingRules.append(rule)
 
 

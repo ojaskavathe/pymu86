@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1696</width>
+    <height>586</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,8 +33,7 @@
     <normaloff>logo.png</normaloff>logo.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(30, 30, 30);
-alternate-background-color: rgb(59, 59, 59);
+   <string notr="true">alternate-background-color: rgb(59, 59, 59);
 font-family: &quot;Cascadia Code&quot;;
 /*font-weight: 500;*/</string>
   </property>
@@ -43,8 +42,8 @@ font-family: &quot;Cascadia Code&quot;;
   </property>
   <widget class="QWidget" name="mainwidget">
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(30, 30, 30);
-color: rgb(221, 221, 221)</string>
+    <string notr="true">background-color: #d9d3c3;
+color: #646456</string>
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
@@ -69,9 +68,7 @@ color: rgb(221, 221, 221)</string>
         <bool>false</bool>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(30, 30, 30);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);</string>
+        <string notr="true"/>
        </property>
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
@@ -96,9 +93,8 @@ color: rgb(235, 235, 235);</string>
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgb(30, 30, 30);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);</string>
+            <string notr="true">background-color: #d9d3c3;
+alternate-background-color: rgb(45, 45, 45);</string>
            </property>
            <property name="tabPosition">
             <enum>QTabWidget::North</enum>
@@ -282,38 +278,82 @@ color: rgb(235, 235, 235);</string>
                 </layout>
                </item>
                <item>
-                <widget class="CodeEditor" name="asmEdit">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <family>Hack NF</family>
-                   <pointsize>10</pointsize>
-                   <weight>9</weight>
-                   <italic>false</italic>
-                   <bold>false</bold>
-                  </font>
-                 </property>
-                 <property name="autoFillBackground">
-                  <bool>true</bool>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">background-color: #282828;
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);
-font: 75 10pt &quot;Hack NF&quot;;</string>
-                 </property>
-                 <property name="sizeAdjustPolicy">
-                  <enum>QAbstractScrollArea::AdjustIgnored</enum>
-                 </property>
-                 <property name="backgroundVisible">
-                  <bool>true</bool>
-                 </property>
-                </widget>
+                <layout class="QHBoxLayout" name="horizontalLayout">
+                 <item>
+                  <widget class="CodeEditor" name="asmEdit">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <family>Cascadia Code</family>
+                     <pointsize>10</pointsize>
+                     <weight>50</weight>
+                     <italic>false</italic>
+                     <bold>false</bold>
+                    </font>
+                   </property>
+                   <property name="autoFillBackground">
+                    <bool>true</bool>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: #fef5e4;
+color: #899b97;
+font-style: &quot;FiraCode NF&quot;;</string>
+                   </property>
+                   <property name="sizeAdjustPolicy">
+                    <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                   </property>
+                   <property name="backgroundVisible">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QScrollBar" name="sbar">
+                   <property name="styleSheet">
+                    <string notr="true">QScrollBar:vertical {
+	border: none;
+    background: #fef5e4;
+    width: 14px;
+    margin: 0;
+	border-radius: 0px;
+ }
+
+/*  HANDLE BAR VERTICAL */
+QScrollBar::handle:vertical {	
+	background-color: #ddd9c8;
+	min-height: 30px;
+	border-radius: 7px;
+}
+QScrollBar::handle:vertical:hover{	
+	background-color: #9a9a8c;
+}
+QScrollBar::handle:vertical:pressed {	
+	background-color: #8d8669;
+}
+
+QScrollBar::add-line:vertical {
+height: 0px;
+}
+
+QScrollBar::sub-line:vertical {
+height: 0px;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+height: 0px;
+}</string>
+                   </property>
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </item>
@@ -328,9 +368,7 @@ font: 75 10pt &quot;Hack NF&quot;;</string>
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgb(30, 30, 30);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);</string>
+            <string notr="true"/>
            </property>
            <property name="tabShape">
             <enum>QTabWidget::Triangular</enum>
@@ -364,9 +402,7 @@ color: rgb(235, 235, 235);</string>
                 <bool>true</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-color: rgb(10, 30, 30);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);</string>
+                <string notr="true">background-color: #d8c49c;</string>
                </property>
                <property name="locale">
                 <locale language="Chinese" country="China"/>
@@ -406,21 +442,27 @@ color: rgb(235, 235, 235);</string>
         <bool>false</bool>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(30, 30, 30);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);</string>
+        <string notr="true">alternate-background-color: rgb(45, 45, 45);</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
+        <item row="0" column="1">
          <widget class="QSplitter" name="rightSplitter">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
           <widget class="QSplitter" name="reg_flag_cs_split">
+           <property name="styleSheet">
+            <string notr="true">background-color: #d9d3c3;
+alternate-background-color: rgb(45, 45, 45);
+font-size: 17px</string>
+           </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
            <widget class="QSplitter" name="gpr_seg_split">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
@@ -429,10 +471,7 @@ color: rgb(235, 235, 235);</string>
               <bool>false</bool>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(33, 37, 43);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);
-font-size: 17px</string>
+              <string notr="true"/>
              </property>
              <property name="title">
               <string>General Purpose</string>
@@ -444,7 +483,7 @@ font-size: 17px</string>
                  <bool>true</bool>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">background-color: #ded6c2;</string>
                 </property>
                 <property name="midLineWidth">
                  <number>0</number>
@@ -453,7 +492,7 @@ font-size: 17px</string>
                  <enum>QAbstractScrollArea::AdjustIgnored</enum>
                 </property>
                 <property name="alternatingRowColors">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <attribute name="headerVisible">
                  <bool>false</bool>
@@ -467,10 +506,7 @@ font-size: 17px</string>
               <bool>false</bool>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(33, 37, 43);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);
-font-size: 17px</string>
+              <string notr="true"/>
              </property>
              <property name="title">
               <string>Segment Registers</string>
@@ -482,7 +518,7 @@ font-size: 17px</string>
                  <bool>true</bool>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">background-color: #ded6c2;</string>
                 </property>
                 <property name="midLineWidth">
                  <number>0</number>
@@ -491,7 +527,7 @@ font-size: 17px</string>
                  <enum>QAbstractScrollArea::AdjustIgnored</enum>
                 </property>
                 <property name="alternatingRowColors">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <attribute name="headerVisible">
                  <bool>false</bool>
@@ -510,10 +546,7 @@ font-size: 17px</string>
               <bool>false</bool>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(33, 37, 43);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);
-font-size: 17px</string>
+              <string notr="true"/>
              </property>
              <property name="title">
               <string>Flag Register</string>
@@ -525,7 +558,7 @@ font-size: 17px</string>
                  <bool>true</bool>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">background-color: #ded6c2;</string>
                 </property>
                 <property name="midLineWidth">
                  <number>0</number>
@@ -534,7 +567,7 @@ font-size: 17px</string>
                  <enum>QAbstractScrollArea::AdjustIgnored</enum>
                 </property>
                 <property name="alternatingRowColors">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <attribute name="headerVisible">
                  <bool>false</bool>
@@ -548,17 +581,27 @@ font-size: 17px</string>
               <bool>false</bool>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(33, 37, 43);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);
-font-size: 17px</string>
+              <string notr="true"/>
              </property>
              <property name="title">
               <string>Stack</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_17">
               <item>
-               <widget class="QTreeView" name="treeViewStack"/>
+               <widget class="QTreeView" name="treeViewStack">
+                <property name="styleSheet">
+                 <string>background-color: #ded6c2;</string>
+                </property>
+                <property name="alternatingRowColors">
+                 <bool>false</bool>
+                </property>
+                <property name="textElideMode">
+                 <enum>Qt::ElideLeft</enum>
+                </property>
+                <property name="indentation">
+                 <number>0</number>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -568,10 +611,7 @@ font-size: 17px</string>
              <bool>false</bool>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgb(33, 37, 43);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);
-font-size: 17px</string>
+             <string notr="true">font-size: 17px</string>
             </property>
             <property name="title">
              <string>Code Segment</string>
@@ -579,11 +619,237 @@ font-size: 17px</string>
             <layout class="QGridLayout" name="gridLayout_14">
              <item row="0" column="0">
               <widget class="QTreeView" name="treeMemory">
+               <property name="palette">
+                <palette>
+                 <active>
+                  <colorrole role="WindowText">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Button">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>222</red>
+                     <green>214</green>
+                     <blue>194</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Text">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="ButtonText">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Base">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>222</red>
+                     <green>214</green>
+                     <blue>194</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Window">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>222</red>
+                     <green>214</green>
+                     <blue>194</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="AlternateBase">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>45</red>
+                     <green>45</green>
+                     <blue>45</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="PlaceholderText">
+                   <brush brushstyle="NoBrush">
+                    <color alpha="128">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                 </active>
+                 <inactive>
+                  <colorrole role="WindowText">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Button">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>222</red>
+                     <green>214</green>
+                     <blue>194</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Text">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="ButtonText">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Base">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>222</red>
+                     <green>214</green>
+                     <blue>194</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Window">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>222</red>
+                     <green>214</green>
+                     <blue>194</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="AlternateBase">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>45</red>
+                     <green>45</green>
+                     <blue>45</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="PlaceholderText">
+                   <brush brushstyle="NoBrush">
+                    <color alpha="128">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                 </inactive>
+                 <disabled>
+                  <colorrole role="WindowText">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Button">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>222</red>
+                     <green>214</green>
+                     <blue>194</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Text">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="ButtonText">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Base">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>222</red>
+                     <green>214</green>
+                     <blue>194</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="Window">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>222</red>
+                     <green>214</green>
+                     <blue>194</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="AlternateBase">
+                   <brush brushstyle="SolidPattern">
+                    <color alpha="255">
+                     <red>45</red>
+                     <green>45</green>
+                     <blue>45</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                  <colorrole role="PlaceholderText">
+                   <brush brushstyle="NoBrush">
+                    <color alpha="128">
+                     <red>100</red>
+                     <green>100</green>
+                     <blue>86</blue>
+                    </color>
+                   </brush>
+                  </colorrole>
+                 </disabled>
+                </palette>
+               </property>
                <property name="autoFillBackground">
                 <bool>true</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true"/>
+                <string notr="true">background-color: #ded6c2;</string>
                </property>
                <property name="frameShadow">
                 <enum>QFrame::Sunken</enum>
@@ -595,10 +861,13 @@ font-size: 17px</string>
                 <enum>QAbstractScrollArea::AdjustIgnored</enum>
                </property>
                <property name="alternatingRowColors">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="rootIsDecorated">
                 <bool>false</bool>
+               </property>
+               <property name="headerHidden">
+                <bool>true</bool>
                </property>
                <attribute name="headerVisible">
                 <bool>false</bool>
@@ -620,9 +889,7 @@ font-size: 17px</string>
              <bool>false</bool>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgb(30, 30, 30);
-alternate-background-color: rgb(45, 45, 45);
-color: rgb(235, 235, 235);</string>
+             <string notr="true"/>
             </property>
             <property name="tabShape">
              <enum>QTabWidget::Rounded</enum>
@@ -646,6 +913,12 @@ color: rgb(235, 235, 235);</string>
              <layout class="QGridLayout" name="gridLayout">
               <item row="0" column="0">
                <widget class="QTreeView" name="treeViewData">
+                <property name="textElideMode">
+                 <enum>Qt::ElideLeft</enum>
+                </property>
+                <property name="indentation">
+                 <number>20</number>
+                </property>
                 <attribute name="headerStretchLastSection">
                  <bool>true</bool>
                 </attribute>
