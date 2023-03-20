@@ -49,3 +49,5 @@ processor_control = [
     'HLT', 'WAIT', 'ESC', 'LOCK',                                   # External Synchronization
     'NOP'                                                           # No Operation
 ]
+
+all = data_transfer + arithmetic + bit_manipulation + string + control_transfer + processor_control

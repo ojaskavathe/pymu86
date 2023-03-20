@@ -1,9 +1,8 @@
 ASSUME CS:CODE,DS:DATA
 
 data segment
-    numS db '      $'
-    string db 'your number is: $'
-    num dw -348
+    first db '\nfirst$'
+    second db 'second$'
 data ends
 
 code segment
@@ -11,42 +10,20 @@ code segment
         mov ax, data
         mov ds, ax
         
-        mov dx, offset string
+        call print
         mov ah, 09h
-        int 21h
-
-        mov ax, num
-        
-        mov bx, 10
-        lea si, numS
-	    add si, 5 
-        cmp ax,0
-        jge split
-        neg ax
-
-        split:
-        xor dx, dx              ;remainder stored in dx, set dx = 0
-        div bx
-        add dl, 30h             ;convert num into corresponding ascii
-        mov [si], dl
-        dec si
-        cmp ax, 0       
-        jne split               ;if not zero, repeat
-        
-        cmp num, 0
-        jge print
-        mov byte ptr [si], '-'   ;if negative, addend '-' 
-        dec si
-        
-        print:
-        inc si
-        mov ah, 9
-        mov dx, si
+        lea dx, first
         int 21h
         
         mov ah, 4ch
         int 21h
 
+        print:
+        mov ah, 09h
+        lea dx, second
+        int 21h
+        ret
+        
      
 code ends
 end start

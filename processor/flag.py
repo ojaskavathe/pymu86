@@ -24,6 +24,20 @@ class FlagRegister:
                (self.parity << 2) + \
                (self.carry)
     
+    def get_from_sym(self,name):
+        self.reg = {
+            'CF':   self.carry,
+            'PF':   self.parity,
+            'AF':   self.auxiliary,
+            'Z':    self.zero,
+            'S':    self.sign,
+            'O':    self.overflow,
+            'TF':   self.trap,
+            'IF':   self.interrupt,
+            'DF':   self.direction
+        }
+        return self.reg[name]
+
     def set_parity(
         self,
         res: int

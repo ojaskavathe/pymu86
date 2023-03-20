@@ -29,7 +29,7 @@ def control_transfer(self: "EU") -> None:
             self.increment_register('SP', -2)
             self.write_memory(self.physical_sp, self.read_register('CS'))
         self.increment_register('SP', -2)                           # push current ip
-        self.write_memory(self.physical_sp, self.read_register('CS'))
+        self.write_memory(self.physical_sp, self.read_register('IP'))
         self.instruction = 'JMP'
         self.execute()
     

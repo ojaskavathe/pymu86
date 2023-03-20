@@ -171,7 +171,7 @@ def arithmetic(self: "EU") -> None:
         if(b == 0):
             raise SyntaxError('Division by zero')
         if (self.operand_size == 1):
-            a = utils.unsigned(self.read_register('AL'), 1)
+            a = utils.unsigned(self.read_register('AX'), 2)
             self.write_register('AL', a // b)
             self.write_register('AH', a % b)
         elif (self.operand_size == 2):
@@ -188,7 +188,7 @@ def arithmetic(self: "EU") -> None:
         if(b == 0):
             raise SyntaxError('Division by zero')
         if (self.operand_size == 1):
-            a = utils.signed(self.read_register('AL'), 1)
+            a = utils.signed(self.read_register('AX'), 2)
             self.write_register('AL', a // b)
             self.write_register('AH', a % b)
         elif (self.operand_size == 2):

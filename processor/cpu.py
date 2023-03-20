@@ -24,4 +24,8 @@ class CPU:
         
         return (self.biu.instruction_queue.empty() and self.biu.instructions_done())
 
+    def print_end_state(self):
+        # print end status
+        self.eu.print("Clock ended\n")
+
         
