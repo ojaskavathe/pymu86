@@ -77,7 +77,22 @@ class DataSegModel(DataModel):
     def __init__(self, BIU: BIU, parent=None):
         super(DataSegModel, self).__init__(['Adr', '+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8'], parent)
 
-        for adr in range(BIU.registers['DS'] * 16, BIU.registers['DS'] * 16 + 256):
+        for adr in range(BIU.registers['DS'] * 16, BIU.registers['DS'] * 16 + 256, 8):
+            item = [hex(adr)]
+            for i in range(8):
+                info = BIU.read_byte(adr + i)
+                if isinstance(info, int):
+                    item.append(hex(info))
+                else:
+                    item.append(info[0])
+
+            self._rootItem.appendChild(DataItem(item))
+
+class ExtraSegModel(DataModel):
+    def __init__(self, BIU: BIU, parent=None):
+        super(ExtraSegModel, self).__init__(['Adr', '+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8'], parent)
+
+        for adr in range(BIU.registers['ES'] * 16, BIU.registers['ES'] * 16 + 256, 8):
             item = [hex(adr)]
             for i in range(8):
                 info = BIU.read_byte(adr + i)

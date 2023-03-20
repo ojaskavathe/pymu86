@@ -7,7 +7,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5 import uic
 
 from ui.codeeditor import CodeEditor, AssemblyHighlighter
-from ui.models import (RegistersModel, FlagModel, CodeSegModel, StackSegModel, DataSegModel)
+from ui.models import (RegistersModel, FlagModel, CodeSegModel, StackSegModel, DataSegModel, ExtraSegModel)
 
 import re
 import sys
@@ -106,6 +106,7 @@ class MainWindow(object):
         self.CodeSegModel = CodeSegModel(self.cpu.biu, self.cpu.biu.registers['IP'])
         self.StackSegModel = StackSegModel(self.cpu.biu, self.cpu.eu.gpr['SP'])
         self.DataSegModel = DataSegModel(self.cpu.biu)
+        self.ExtraSegModel = ExtraSegModel(self.cpu.biu)
 
     def setupTrees(self):
         treeGenericRegs = self.gui.findChild(QTreeView, "treeGenericRegs")
@@ -143,7 +144,14 @@ class MainWindow(object):
         for i in range(1,9):
             width = treeViewData.width() - treeViewData.columnWidth(0)
             treeViewData.setColumnWidth(i, width // 8)
-            # treeViewData.resizeColumnToContents(i)
+
+        self.treeViewExtra = self.gui.findChild(QTreeView, "treeViewExtra")
+        treeViewExtra = self.treeViewExtra
+        treeViewExtra.setModel(self.ExtraSegModel)
+        treeViewExtra.resizeColumnToContents(0)
+        for i in range(1,9):
+            width = treeViewExtra.width() - treeViewExtra.columnWidth(0)
+            treeViewExtra.setColumnWidth(i, width // 8)
 
     def setupActions(self):
         self.actionNew = self.gui.findChild(QAction, "actionNew")
